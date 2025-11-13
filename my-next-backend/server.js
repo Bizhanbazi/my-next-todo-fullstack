@@ -1,13 +1,17 @@
-const cors = require("cors"); // اضافه کردن CORS
 const express = require("express");
+const cors = require("cors");
 const app = express();
 const PORT = 5000;
 
-// Middleware to parse JSON
+// ===== CORS =====
+app.use(cors({
+  origin: "*",
+  methods: ["GET", "POST", "PUT", "DELETE"],
+  allowedHeaders: ["Content-Type"],
+}));
 
-app.use(cors()); // اجازه اتصال فرانت‌اند
-app.use(express.json()); // برای خواندن JSON
-
+// ===== Middleware =====
+app.use(express.json());
 
 // ===== In-memory ToDo data =====
 let todos = [
@@ -17,12 +21,12 @@ let todos = [
 
 // ===== API Routes =====
 
-// 1️⃣ Get all todos
+// Get all todos
 app.get("/api/todos", (req, res) => {
   res.json(todos);
 });
 
-// 2️⃣ Add a new todo
+// Add a new todo
 app.post("/api/todos", (req, res) => {
   const { text } = req.body;
   const newTodo = { id: Date.now(), text, done: false };
@@ -30,28 +34,26 @@ app.post("/api/todos", (req, res) => {
   res.json(newTodo);
 });
 
-// 3️⃣ Toggle todo status
+// Toggle todo
 app.put("/api/todos/:id", (req, res) => {
   const id = parseInt(req.params.id);
-  todos = todos.map((t) =>
-    t.id === id ? { ...t, done: !t.done } : t
-  );
+  todos = todos.map(t => t.id === id ? { ...t, done: !t.done } : t);
   res.json({ success: true });
 });
 
-// 4️⃣ Delete a todo
+// Delete todo
 app.delete("/api/todos/:id", (req, res) => {
   const id = parseInt(req.params.id);
-  todos = todos.filter((t) => t.id !== id);
+  todos = todos.filter(t => t.id !== id);
   res.json({ success: true });
 });
 
-// ===== Test route =====
+// Test route
 app.get("/", (req, res) => {
   res.send("Server is running! 🚀");
 });
 
-// ===== Start server =====
+// Start server
 app.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);
 });
